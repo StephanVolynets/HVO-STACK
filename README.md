@@ -69,18 +69,4 @@ _Built with the tools and technologies:_
 - **Cloud & DevOps:** Docker, Terraform, GCP
 
 ---
-
-## Quick Start
-
-```bash
-# Clone the repo
-git clone https://github.com/yourusername/hvo-stack.git
-
-# Install dependencies
-npm install
-
-# Start the dev server
-npm run dev
-
-```
 </div>
