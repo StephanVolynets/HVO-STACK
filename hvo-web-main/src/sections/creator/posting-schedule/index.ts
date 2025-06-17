@@ -1,0 +1,1 @@
+export { default as PostingScheduleView } from "./posting-schedule";

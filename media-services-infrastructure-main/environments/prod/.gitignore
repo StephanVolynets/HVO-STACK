@@ -1,0 +1,5 @@
+# Ignore .tfvars files
+*.tfvars
+
+# But track example.tfvars
+!example.tfvars

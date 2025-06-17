@@ -1,0 +1,1 @@
+export { default as BulkView } from "./bulk-view";

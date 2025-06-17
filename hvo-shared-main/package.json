@@ -1,0 +1,32 @@
+{
+  "name": "hvo-shared",
+  "version": "1.0.166",
+  "description": "This package contains shared resources for the MVP Masters project.",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "tsc",
+    "build": "tsc",
+    "pb": "node publish.js"
+  },
+  "author": "Sixcore",
+  "license": "ISC",
+  "dependencies": {
+    "@firebase/app": "^0.9.25",
+    "@firebase/firestore": "^4.4.0",
+    "@firebase/firestore-types": "^3.0.0",
+    "@firebase/util": "^1.5.1",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.197",
+    "dotenv": "^16.4.5",
+    "typescript": "^4.5.2"
+  }
+}

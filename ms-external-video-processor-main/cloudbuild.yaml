@@ -1,0 +1,48 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "us-east1-docker.pkg.dev/$PROJECT_ID/microservices/external-video-processor:$COMMIT_SHA"
+      - "."
+
+  # Step 2: Push the Docker image to Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "push"
+      - "us-east1-docker.pkg.dev/$PROJECT_ID/microservices/external-video-processor:$COMMIT_SHA"
+
+  # Step 3: Deploy the image to Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - "run"
+      - "deploy"
+      - "ms-external-video-processor"
+      - "--image"
+      - "us-east1-docker.pkg.dev/$PROJECT_ID/microservices/external-video-processor:$COMMIT_SHA"
+      - "--platform"
+      - "managed"
+      - "--region"
+      - "us-east1"
+      - "--allow-unauthenticated"
+      - "--memory"
+      - "4Gi"
+      - "--cpu"
+      - "2"
+      - "--concurrency"
+      - "3"
+      - "--max-instances"
+      - "5"
+      - "--service-account"
+      - "video-compression-service@$PROJECT_ID.iam.gserviceaccount.com"
+      - "--set-env-vars"
+      - "BUCKET_NAME=hvo-assets"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  logStreamingOption: STREAM_ON
+
+substitutions:
+  _PROJECT_ID: "human-voice-over-dev"
+  _COMMIT_SHA: "${SHORT_SHA}"

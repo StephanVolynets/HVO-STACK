@@ -1,0 +1,500 @@
+datasource postgres {
+    provider = "postgresql"
+    url      = env("POSTGRES_URL")
+}
+
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+generator zod {
+    provider              = "nestjs-zod-prisma"
+    output                = "./zod"
+    relationModel         = true
+    generateDto           = false
+    modelCase             = "camelCase"
+    modelSuffix           = "Schema"
+    useDecimalJs          = true
+    prismaJsonNullability = true
+}
+
+model User {
+    id           Int     @id @default(autoincrement())
+    firebase_uid String? @unique // Nullable initially, but can be made required later
+    firstName    String?
+    lastName     String?
+    full_name    String
+    email        String  @unique
+    role         Role
+    photo_url    String?
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    // Relations
+    // videos                Video[]                 @relation("UserVideos")
+    // vendorAssignments     Assignment[]            @relation("VendorAssignments")
+    // transcriptions        Assignment[]            @relation("TranscriptorAssignments")
+    // tickets               Ticket[]
+    // translatorAssignments TranslationAssignment[] @relation("TranslatorAssignments")
+    // voiceActorAssignments TranslationAssignment[] @relation("VoiceActorAssignments")
+    creator Creator?
+    staff   Staff?
+    // Vendor  Vendor[]
+    vendor  Vendor?
+
+    Token Token[]
+
+    assistant         Assistant?
+    managedAssistants Assistant[] @relation("UserAssistants")
+}
+
+enum Role {
+    ADMIN
+    VENDOR
+    CREATOR
+    STAFF
+    CREATOR_ASSISTANT
+    ADMIN_ASSISTANT
+    VENDOR_ASSISTANT
+}
+
+model Token {
+    id String @id @default(uuid())
+
+    token     String   @unique
+    expiresAt DateTime
+    used      Boolean  @default(false)
+
+    createdAt DateTime @default(now()) // Creation timestamp
+    updatedAt DateTime @updatedAt
+
+    //   Relations
+    userId Int
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Assistant {
+    id   Int  @id @map("user_id")
+    user User @relation(fields: [id], references: [id], onDelete: Cascade)
+
+    // The user this assistant works for
+    managerId Int
+    manager   User @relation("UserAssistants", fields: [managerId], references: [id])
+}
+
+model Vendor {
+    id   Int  @id @map("user_id")
+    user User @relation(fields: [id], references: [id], onDelete: Cascade)
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model Creator {
+    id   Int  @id @map("user_id")
+    user User @relation(fields: [id], references: [id], onDelete: Cascade)
+
+    username             String  @unique
+    description          String?
+    youtube_channel_link String? // Deprecated
+    rate                 Float // Rate in dollars per minute
+
+    videos_in_queue    Int @default(0)
+    videos_in_progress Int @default(0)
+    videos_completed   Int @default(0)
+
+    discordData Json? // Store group_id and channels in a JSON field
+
+    root_folder_id String?
+    created_at     DateTime @default(now())
+    updated_at     DateTime @updatedAt
+
+    // Relations
+    // languages Language[] @relation("CreatorLanguages")
+    languages CreatorLanguage[]
+    staffs    Staff[]
+    videos    Video[]
+    channels  YoutubeChannel[]
+}
+
+model YoutubeChannel {
+    id         Int      @id @default(autoincrement())
+    channel_id String   @unique // YouTube channel ID
+    title      String
+    url        String
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    // Relations
+    creator    Creator @relation(fields: [creator_id], references: [id])
+    creator_id Int
+
+    videos Video[]
+}
+
+model Staff {
+    id   Int  @id @map("user_id")
+    user User @relation(fields: [id], references: [id], onDelete: Cascade)
+
+    staff_type StaffType
+    rate       Float // Rate in dollars per minute
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    // Relations
+    language    Language @relation(fields: [language_id], references: [id])
+    language_id Int
+
+    defaultCreator     Creator? @relation(fields: [default_creator_id], references: [id], onDelete: SetNull)
+    default_creator_id Int?
+
+    tasks TaskStaff[]
+}
+
+enum StaffType {
+    TRANSCRIPTOR
+    TRANSLATOR
+    VOICE_ACTOR
+    AUDIO_ENGINEER
+}
+
+model Video {
+    id Int @id @default(autoincrement())
+
+    youtube_url   String?
+    title         String
+    description   String?
+    thumbnail_url String?
+    status        VideoStatus @default(BACKLOG)
+    form_type     FormType?   @default(LONG) // Change to required in the next migration
+
+    isInitialized Boolean @default(false) // Indicates if video and all audio dubs are fully initialized and ready
+
+    expected_by DateTime?
+
+    root_folder_id         String?
+    deliverables_folder_id String?
+    source_files_folder_id String?
+    raw_script_folder_id   String?
+    raw_audio_folder_id    String?
+    mp4_folder_id          String?
+    m_and_e_folder_id      String?
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    sonixMediaId String?
+
+    isVideoResourceUploaded Boolean @default(false)
+    isAudioResourceUploaded Boolean @default(false)
+
+    // Relations
+    creator_id Int
+    creator    Creator @relation(fields: [creator_id], references: [id])
+
+    isRawTranscriptReady Boolean? @default(false)
+
+    transcription_task_id Int?  @unique
+    transcriptionTask     Task? @relation(fields: [transcription_task_id], references: [id])
+
+    youtubeChannelId Int? // Will be REQUIRED after migration
+    youtubeChannel   YoutubeChannel? @relation(fields: [youtubeChannelId], references: [id])
+
+    // languages VideoLanguage[]
+    audioDubs            AudioDub[]
+    feedbacks            Feedback[]
+    videoProcessingIssue VideoProcessingIssue[]
+    shareTokens          VideoShareToken[]
+}
+
+enum VideoStatus {
+    BACKLOG
+    IN_PROGRESS
+    COMPLETED
+}
+
+enum FormType {
+    SHORT
+    LONG
+}
+
+model Language {
+    id Int @id @default(autoincrement())
+
+    code        String  @unique
+    name        String
+    countryName String? @map("country_name")
+    flag_url    String?
+
+    // Relations
+    // creators Creator[] @relation("CreatorLanguages")
+    creators  CreatorLanguage[]
+    staffs    Staff[]
+    // videoLanguages         VideoLanguage[]
+    // translationAssignments TranslationAssignment[]
+    // tickets                Ticket[]
+    // files                  File[]
+    // videos   VideoLanguage[]
+    AudioDub  AudioDub[]
+    feedbacks Feedback[]
+}
+
+model CreatorLanguage {
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    // Relations
+    creator    Creator @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+    creator_id Int
+
+    language    Language @relation(fields: [language_id], references: [id], onDelete: Cascade)
+    language_id Int
+
+    active Boolean @default(true) // Attribute to indicate if the language is active or inactive for this creator
+
+    // @@unique([creatorId, languageId]) // Enforce uniqueness on creator and language combination
+    // Composite primary key (creatorId + languageId)
+    @@id([creator_id, language_id])
+}
+
+model AudioDub {
+    id Int @id @default(autoincrement())
+
+    status AudioDubStatus @default(PENDING)
+    // progress AudioDubProgress @default(TRANSCRIPTION)
+    phase  AudioDubPhase  @default(TRANSCRIPTION)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    root_folder_id        String?
+    final_folder_id       String?
+    mixed_audio_folder_id String?
+
+    translatedTitle       String?
+    translatedDescription String?
+    approved              Boolean? @default(false)
+
+    // Relations
+    videoId Int
+    video   Video @relation(fields: [videoId], references: [id])
+
+    languageId Int
+    language   Language @relation(fields: [languageId], references: [id])
+
+    tasks     Task[]
+    feedbacks Feedback[]
+}
+
+// enum AudioDubProgress {
+//     TRANSCRIPTION
+//     TRANSLATION
+//     VOICE_OVER
+//     AUDIO_ENGINEERING
+//     REVIEW
+// }
+
+enum AudioDubPhase {
+    TRANSCRIPTION
+    TRANSLATION
+    VOICE_OVER
+    AUDIO_ENGINEERING
+}
+
+enum AudioDubStatus {
+    PENDING
+    IN_PROGRESS
+    REVIEW
+    COMPLETED
+}
+
+model Feedback {
+    id Int @id @default(autoincrement())
+
+    vendorPhase AudioDubPhase? // Vendor's confirmed phase after review
+    originPhase AudioDubPhase? // The phase the vendor started the feedback
+
+    createdAt DateTime       @default(now())
+    status    FeedbackStatus @default(NEW)
+
+    reportedLanguageId Int?
+    reportedLanguage   Language? @relation(fields: [reportedLanguageId], references: [id])
+
+    videoId Int? // Change to be non nullable after migration
+    video   Video? @relation(fields: [videoId], references: [id])
+
+    // Relations 
+    // To be removed (audiodub) 
+    audioDubId Int?
+    audioDub   AudioDub? @relation(fields: [audioDubId], references: [id])
+
+    issues FeedbackIssue[]
+    tasks  FeedbackTask[]
+}
+
+enum FeedbackStatus {
+    NEW
+    IN_PROGRESS
+    RESOLVED
+    REJECTED
+}
+
+model FeedbackIssue {
+    id Int @id @default(autoincrement())
+
+    startTimestamp Int // Start timestamp in seconds
+    endTimestamp   Int // End timestamp in seconds
+
+    description String // Description of the issue
+
+    // vendorDescription String? // Optional clarification added by the vendor
+    // vendorPhase       AudioDubPhase // Phase that vendor determines this issue belongs to
+
+    createdAt DateTime @default(now())
+
+    status FeedbackIssueStatus @default(NEW)
+
+    // Relations
+    feedbackId Int
+    feedback   Feedback @relation(fields: [feedbackId], references: [id])
+}
+
+enum FeedbackIssueStatus {
+    NEW // Submitted by creator
+    IN_PROGRESS // Acknowledged & addressed by vendor
+    RESOLVED // Who & When resolves the feedback?
+    REJECTED
+}
+
+enum FeedbackPhase {
+    UNKNOWN
+    TRANSCRIPTION
+    TRANSLATION
+    VOICE_OVER
+    AUDIO_ENGINEERING
+}
+
+model Task {
+    id Int @id @default(autoincrement())
+
+    status TaskStatus @default(PENDING)
+    type   TaskType
+
+    autoUploadedPendingSubmission Boolean @default(false)
+
+    resources_folder_id      String?
+    uploaded_files_folder_id String?
+
+    expected_delivery_date DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    audioDubId Int?
+    audioDub   AudioDub? @relation(fields: [audioDubId], references: [id])
+
+    staffs    TaskStaff[]
+    feedbacks FeedbackTask[]
+
+    video Video?
+}
+
+enum TaskStatus {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
+}
+
+enum TaskType {
+    TRANSCRIPTION
+    TRANSLATION
+    VOICE_OVER
+    AUDIO_ENGINEERING
+}
+
+model TaskStaff {
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    taskId Int
+    task   Task @relation(fields: [taskId], references: [id])
+
+    staffId Int
+    staff   Staff @relation(fields: [staffId], references: [id])
+
+    @@id([taskId, staffId])
+}
+
+model Notification {
+    id        Int      @id @default(autoincrement())
+    email     Boolean  @default(false)
+    discord   Boolean  @default(false)
+    message   String
+    metadata  Json // Store custom fields for each provider (e.g., email subject, Discord channel ID)
+    createdAt DateTime @default(now())
+}
+
+// Join table for Feedback-Task many-to-many relationship
+model FeedbackTask {
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    feedbackId Int
+    feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+
+    taskId Int
+    task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+    @@id([feedbackId, taskId])
+}
+
+model VideoProcessingIssue {
+    id Int @id @default(autoincrement())
+
+    videoId Int
+    video   Video @relation(fields: [videoId], references: [id])
+
+    stage        VideoProcessingStage
+    status       VideoProcessingIssueStatus @default(OPEN)
+    errorMessage String
+    errorDetails Json? // For storing additional error information, stack traces, etc.
+
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
+    resolvedAt DateTime?
+}
+
+enum VideoProcessingStage {
+    TRANSCODING
+    BOX_UPLOAD
+    SONIX_UPLOAD
+    VIDEO_TRANSCODING
+    BOX_TO_GCS_TRANSFER
+    GDRIVE_TO_GCS_TRANSFER
+    YOUTUBE_TO_GCS_TRANSFER
+    OTHER
+}
+
+enum VideoProcessingIssueStatus {
+    OPEN
+    IN_PROGRESS
+    RESOLVED
+    IGNORED
+}
+
+model VideoShareToken {
+    id        String   @id @default(uuid())
+    token     String   @unique
+    videoId   Int
+    video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+    expiresAt DateTime
+    used      Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

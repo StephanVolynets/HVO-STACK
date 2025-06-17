@@ -1,0 +1,58 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "us-east1-docker.pkg.dev/${PROJECT_ID}/microservices/video-compression:${COMMIT_SHA}"
+      - "."
+
+  # Step 2: Push the Docker image to Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "push"
+      - "us-east1-docker.pkg.dev/${PROJECT_ID}/microservices/video-compression:${COMMIT_SHA}"
+
+  # Step 3: Deploy the image to Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - "run"
+      - "deploy"
+      - "ms-video-compression"
+      - "--image"
+      - "us-east1-docker.pkg.dev/${PROJECT_ID}/microservices/video-compression:${COMMIT_SHA}"
+      - "--platform"
+      - "managed"
+      - "--region"
+      - "us-east1"
+      - "--allow-unauthenticated"
+      - "--memory"
+      - "4Gi"
+      - "--cpu"
+      - "2"
+      - "--concurrency"
+      - "3"
+      - "--max-instances"
+      - "5"
+      - "--min-instances"
+      - "1"
+      - "--timeout"
+      - "900s"
+      - "--service-account"
+      - "video-compression-service@${PROJECT_ID}.iam.gserviceaccount.com"
+      - "--set-env-vars"
+      - "SONIX_API_KEY=${_SONIX_API_KEY},BOX_CONFIG_BASE_64=${_BOX_CONFIG_BASE_64},GCS_BUCKET=${_GCS_BUCKET},API_ENDPOINT=${_API_ENDPOINT},PUBSUB_VIDEO_TRANSCODING_REQUESTS_TOPIC=${_PUBSUB_REQUESTS_TOPIC},PUBSUB_VIDEO_TRANSCODING_COMPLETIONS_TOPIC=${_PUBSUB_COMPLETIONS_TOPIC},PUBSUB_BOX_TO_GCS_TOPIC=${_PUBSUB_BOX_TO_GCS_TOPIC},GCP_REGION=us-east1,PROJECT_ID=${PROJECT_ID}"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  logStreamingOption: STREAM_ON
+
+substitutions:
+  _COMMIT_SHA: "${SHORT_SHA}"
+  _SONIX_API_KEY: "placeholder" # Set in trigger
+  _BOX_CONFIG_BASE_64: "placeholder" # Set in trigger
+  _GCS_BUCKET: "placeholder" # Set in trigger
+  _API_ENDPOINT: "placeholder" # Set in trigger
+  _PUBSUB_REQUESTS_TOPIC: "video-transcoding-requests"
+  _PUBSUB_COMPLETIONS_TOPIC: "video-transcoding-completions"
+  _PUBSUB_BOX_TO_GCS_TOPIC: "box-to-gcs"

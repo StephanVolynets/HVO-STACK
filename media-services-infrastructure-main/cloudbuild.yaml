@@ -1,0 +1,72 @@
+steps:
+  # Install dependencies
+  - name: "hashicorp/terraform:1.5.0"
+    id: "terraform-init"
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        set -e
+        echo "Current directory: $(pwd)"
+        echo "Directory contents: $(ls -la)"
+        echo "Checking if environments/${_ENVIRONMENT} exists..."
+        if [ ! -d "environments/${_ENVIRONMENT}" ]; then
+          echo "ERROR: Directory environments/${_ENVIRONMENT} not found!"
+          exit 1
+        fi
+        cd environments/${_ENVIRONMENT}
+        echo "Running terraform init in $(pwd)"
+        terraform init
+
+  # Validate Terraform syntax
+  - name: "hashicorp/terraform:1.5.0"
+    id: "terraform-validate"
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        cd environments/${_ENVIRONMENT}
+        terraform validate
+    waitFor: ["terraform-init"]
+
+  # Plan Terraform changes
+  - name: "hashicorp/terraform:1.5.0"
+    id: "terraform-plan"
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        cd environments/${_ENVIRONMENT}
+        terraform plan -var="microservice_url=${_MICROSERVICE_URL}" -out=tfplan
+    waitFor: ["terraform-validate"]
+
+  # Apply Terraform changes (only if _APPLY=true)
+  - name: "hashicorp/terraform:1.5.0"
+    id: "terraform-apply"
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        if [ "${_APPLY}" = "true" ]; then
+          cd environments/${_ENVIRONMENT}
+          terraform apply tfplan
+        else
+          echo "Skipping apply step. Set _APPLY=true to apply changes."
+        fi
+    waitFor: ["terraform-plan"]
+
+  # Save the plan as an artifact
+  - name: "gcr.io/cloud-builders/gsutil"
+    args: ["cp", "environments/${_ENVIRONMENT}/tfplan", "gs://${_ARTIFACT_BUCKET}/terraform/plans/${BUILD_ID}/tfplan"]
+    waitFor: ["terraform-plan"]
+
+substitutions:
+  _ENVIRONMENT: "dev" # Default to dev environment
+  _APPLY: "false" # Default to not applying changes
+  _MICROSERVICE_URL: ""
+  _ARTIFACT_BUCKET: "${PROJECT_ID}-artifacts"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  env:
+    - "TF_VAR_project_id=${PROJECT_ID}"

@@ -1,0 +1,1 @@
+export { default as VideoControls } from "./video-controls";

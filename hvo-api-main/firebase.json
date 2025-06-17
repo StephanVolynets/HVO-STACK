@@ -1,0 +1,23 @@
+{
+  "hosting": {
+    "public": "public",
+    "target": "api",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "hvo-api",
+          "region": "europe-west3"
+        }
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/",
+        "destination": "/api",
+        "type": 301
+      }
+    ]
+  }
+}

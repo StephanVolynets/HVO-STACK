@@ -1,0 +1,1 @@
+export { default as VideoContent } from "./video-content";

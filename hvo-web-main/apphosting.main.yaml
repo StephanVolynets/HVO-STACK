@@ -1,0 +1,28 @@
+runConfig:
+  minInstances: 1
+  maxInstances: 10
+  cpu: 1
+  memoryMiB: 1024
+  concurrency: 80
+
+env:
+  - variable: NEXT_PUBLIC_APP_TYPE
+    value: "main"
+
+  # Firebase-related secrets (secured in Firebase App Hosting)
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    secret: NEXT_PUBLIC_FIREBASE_API_KEY
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    secret: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    secret: NEXT_PUBLIC_FIREBASE_APP_ID
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    secret: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    secret: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    secret: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+  - variable: NEXT_PUBLIC_API_ENDPOINT
+    secret: NEXT_PUBLIC_API_ENDPOINT
+  - variable: NEXT_PUBLIC_CLIENT_URL
+    secret: NEXT_PUBLIC_CLIENT_URL

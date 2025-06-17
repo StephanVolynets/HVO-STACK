@@ -1,0 +1,26 @@
+/* tooltip.css */
+
+/* Style for the tooltip box */
+.tippy-box[data-theme~="custom"] {
+  background-color: white; /* White background */
+  color: black; /* Text color */
+  border: 1px solid #d9d9d9; /* Light gray border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow */
+  padding: 8px; /* Add padding inside the tooltip */
+}
+
+/* Style for the tooltip arrow */
+.tippy-box[data-theme~="custom"] > .tippy-arrow {
+  width: 16px;
+  height: 16px;
+  color: #d9d9d9; /* Inside color of the arrow */
+  border-color: #d9d9d9;
+}
+
+.tippy-box[data-theme~="custom"][data-placement^="right"] > .tippy-arrow::before {
+  border: "1px solid #bfbfbf";
+  margin: 5;
+  /* background-color: #fefefe; */
+  /* color: #515151; */
+}

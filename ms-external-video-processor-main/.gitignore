@@ -1,0 +1,15 @@
+# Node.js dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Build artifacts
+dist/
+*.tsbuildinfo
+
+# Environment variables
+.env
+
+# OS-specific files
+.DS_Store

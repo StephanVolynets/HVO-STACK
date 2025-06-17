@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.d.ts
+
+# Ignore all .js files except publish.js
+*.js
+!publish.js
+
+yarn.lock
+package-lock.json
+yarn-error.log

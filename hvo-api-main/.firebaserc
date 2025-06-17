@@ -1,0 +1,24 @@
+{
+  "projects": {
+    "dev": "hvo-dev",
+    "prod": "hvo-prod"
+  },
+  "targets": {
+    "hvo-dev": {
+      "hosting": {
+        "api": [
+          "hvo-api-dev"
+        ]
+      }
+    },
+    "hvo-prod": {
+      "hosting": {
+        "api": [
+          "hvo-api-prod"
+        ]
+      }
+    }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}

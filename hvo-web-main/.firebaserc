@@ -1,0 +1,24 @@
+{
+  "projects": {
+    "default": "human-voice-over-prod",
+    "dev": "hvo-dev",
+    "prod": "hvo-prod"
+  },
+  "targets": {
+    "hvo-prod": {
+      "hosting": {
+        "site": [
+          "hvo-prod"
+        ]
+      }
+    },
+    "hvo-dev": {
+      "hosting": {
+        "site": [
+          "hvo-dev"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

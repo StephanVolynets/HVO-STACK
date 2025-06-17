@@ -1,0 +1,24 @@
+{
+  "apphosting": {
+    "source": ".",
+    "appAssociation": "AUTO"
+  },
+  "hosting": {
+    "public": "public",
+    "target": "hvo-web",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/dashboard/users/list"
+      },
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "hvo-web",
+          "region": "us-central1"
+        }
+      }
+    ]
+  }
+}
