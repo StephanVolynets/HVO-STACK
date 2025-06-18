@@ -22,7 +22,7 @@ export const getApp = async () => {
     storageBucket: STORAGE_BUCKET,
     credential: APP_ENV === "local" ? credential.cert(serviceAccount as ServiceAccount) : applicationDefault(),
   });
-
+  
   const origin = APP_ENV === "local" ? /http:\/\/localhost:[0-9]{4,5}/ : [CLIENT_URL, ADMIN_CLIENT_URL];
 
   const app = await NestFactory.create(AppModule, {
