@@ -1,6 +1,6 @@
 <div align="center">
   
-<h1 style="font-size: 50px">HVO-STACK</h1> 
+<h1 style="font-size: 50px">Human Voice Over STACK</h1> 
 
 *Transforming Ideas Into Possibilities*
 
