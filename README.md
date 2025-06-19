@@ -49,9 +49,10 @@ _Built with the tools and technologies:_
 
 
 > **HVO STACK** powers scalable, automated pipelines for multilingual video localization. This system handles high volume video processing, seamless API integrations, and dynamic automations, helping Human Voice Over (HVO) deliver world class localized video content at scale.
-
 ---
 # HVO-STACK Documentation 
+</div>
+
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
@@ -972,11 +973,6 @@ NEXT_PUBLIC_ENABLE_DEBUG=true yarn dev
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [Box API Documentation](https://developer.box.com/)
 
-### Team Contacts
-- Technical Lead: [Contact Information]
-- DevOps: [Contact Information]
-- Product Owner: [Contact Information]
-
 ---
 
 ## Appendix
@@ -989,9 +985,6 @@ NEXT_PUBLIC_ENABLE_DEBUG=true yarn dev
 - **Task**: Unit of work in the localization pipeline
 
 ### Acronyms
-- **HVO**: Human Voice Over
-- **API**: Application Programming Interface
-- **CRUD**: Create, Read, Update, Delete
 - **RBAC**: Role-Based Access Control
 - **JWT**: JSON Web Token
 - **DTO**: Data Transfer Object
