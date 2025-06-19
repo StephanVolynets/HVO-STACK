@@ -41,6 +41,7 @@ export const getApp = async () => {
     .setDescription("The HVO API")
     .setVersion("1.0")
     .addTag("hvo")
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
