@@ -635,15 +635,15 @@ CLIENT_URL=http://localhost:3000   # Frontend URL
 ADMIN_CLIENT_URL=http://localhost:3001  # Admin panel URL
 
 # Firebase Configuration
-FIREBASE_PROJECT_ID=human-voice-over-prod
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-q1w3d@human-voice-over-prod.iam.gserviceaccount.com
+FIREBASE_PROJECT_ID=hxxxx
+FIREBASE_CLIENT_EMAIL=xxxx
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 STORAGE_BUCKET=human-voice-over-prod.appspot.com
 
 # Box API Configuration
-BOX_CLIENT_ID=n5qcq0fj1rxvgqtnpen0alnzwe5dj8kx
-BOX_CLIENT_SECRET=MLmVccfLHzvxub5laf9s8pVm9SshoEKe
-BOX_ENTERPRISE_ID=1196523692
+BOX_CLIENT_ID=xxxxx
+BOX_CLIENT_SECRET=xxxx
+BOX_ENTERPRISE_ID=xxxx
 BOX_CONFIG_BASE_64=<base64 encoded Box config JSON>
 
 # External APIs
@@ -659,7 +659,7 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-specific-password
-EMAIL_FROM=noreply@hvo.com
+EMAIL_FROM=xxx
 
 # Redis Configuration (for queues)
 REDIS_HOST=localhost
@@ -679,12 +679,12 @@ BULL_REDIS_PORT=6379
 
 ```bash
 # Firebase Client Configuration
-NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAJUwQbgNz9KKLrKNTGbE7m1hvo12FD4i0
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=human-voice-over-prod
-NEXT_PUBLIC_FIREBASE_APP_ID=1:894018463290:web:2a07cc4aad93eb93b5c8f3
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=894018463290
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=human-voice-over-prod.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=human-voice-over-prod.appspot.com
+NEXT_PUBLIC_FIREBASE_API_KEY=xxxx
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=xxxx
+NEXT_PUBLIC_FIREBASE_APP_ID=1:xxx
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=xxx
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=xxxx
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=xxx
 
 # API Configuration
 NEXT_PUBLIC_API_ENDPOINT=http://localhost:8080/api
